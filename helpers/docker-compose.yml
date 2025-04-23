@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: nigeria
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d:ro
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
