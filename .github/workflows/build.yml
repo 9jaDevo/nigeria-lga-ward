@@ -1,0 +1,48 @@
+name: Rebuild seed files
+
+# ──────────────────────────────────────────────────────────────
+# Triggers
+# • Every Monday at 02:00 UTC
+# • Manual “Run workflow” button in the GitHub UI
+# ──────────────────────────────────────────────────────────────
+on:
+  schedule:
+    - cron: '0 2 * * 1'     # ↳ adjust if you prefer a different day/time
+  workflow_dispatch:        # ↳ enables the manual trigger
+
+# The job needs permission to push commits back to the repo
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - uses: actions/checkout@v4
+
+      # 2. Set up Python (any 3.x)
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # 3. Install any runtime deps (none except mysql-connector, required by the script)
+      - run: pip install --no-cache-dir mysql-connector-python
+
+      # 4. Run the generator
+      - name: Build SQL seeds
+        run: python scripts/build_seeds.py
+
+      # 5. Commit & push only if files changed
+      - name: Commit updated seeds
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/*.sql
+            git commit -m "auto: refresh seed files $(date -u +'%Y-%m-%d')"
+            git push
+          else
+            echo "No changes detected — nothing to commit."
+          fi
