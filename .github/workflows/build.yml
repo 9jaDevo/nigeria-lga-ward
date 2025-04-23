@@ -8,38 +8,37 @@ name: Rebuild seed files
 
 on:
   schedule:
-    - cron: '0 2 * * 1'              # every Monday 02:00 UTC
-  workflow_dispatch:
+    - cron: '0 2 * * 1'        # every Monday 02:00 UTC
+  workflow_dispatch:         # manual trigger
 
 permissions:
-  contents: write
+  contents: write            # allow commits
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      # 1. Checkout repo
-      - uses: actions/checkout@v4
 
-      # 2. Set up Python
-      - uses: actions/setup-python@v5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      # 3. Install script deps
-      - run: pip install --no-cache-dir mysql-connector-python
+      - name: Install dependencies
+        run: pip install --no-cache-dir mysql-connector-python
 
-      # 4. Rebuild SQL files
       - name: Build SQL seeds
         run: python scripts/build_seeds.py
 
-      # 5. Commit & push if ANY tracked file changed
-      - name: Commit updated seeds
+      - name: Commit updated seeds (only /data)
         run: |
-          # stage everything (new + changed + deletes)
-          git add -A
+          # stage SQL + JSON in data/
+          git add data/*.sql data/states-and-lgas-and-wards.json || true
 
-          # if nothing staged, quit quietly
+          # nothing to commit?
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
@@ -50,5 +49,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # commit & push
-          git commit -m "auto: refresh seed files $(date -u +'%Y-%m-%d')"
+          git commit -m "ci: refresh seed files $(date -u +'%Y-%m-%d')"
           git push
