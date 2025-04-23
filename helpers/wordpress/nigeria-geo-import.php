@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: Nigeria Geo Import
- * Plugin URI: https://github.com/9jaDevo/
+ * Plugin URI: https://github.com/9jaDevo/nigeria-lga-ward
  * Description: One-click import of states, LGAs & wards.
  * Version: 1.0.0
  * Author: Michael Akinwumi
