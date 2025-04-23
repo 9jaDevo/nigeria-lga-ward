@@ -11,8 +11,8 @@
 ## 🔗 Quick import
 
 ```bash
-git clone https://github.com/<your-user>/nigeria-lga-ward-sql.git
-cd nigeria-lga-ward-sql/data
+git clone https://github.com/9jaDevo/nigeria-lga-ward.git
+cd nigeria-lga-ward/data
 
 mysql -u root -p yourdb < nigeria_states_seed.sql
 mysql -u root -p yourdb < nigeria_lgas_seed.sql
